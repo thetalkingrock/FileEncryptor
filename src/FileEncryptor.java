@@ -16,6 +16,7 @@ import javafx.scene.layout.*;
 import javafx.scene.control.*;
 import javafx.event.*;
 import javafx.geometry.*;
+
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
@@ -23,20 +24,37 @@ import java.util.Scanner;
 
 public class FileEncryptor extends Application {
 
+	Label beforeFile;
+	Label beforeShift;
+	TextField file;
+	TextField shift;
+	
 	public static void main(String[] args) {
 		
 		launch(args);
 	}
 	
+	@Override
 	public void start(Stage stage){
 		
 		stage.setTitle("File Encryptor");
 		
 		FlowPane root = new FlowPane();
-		
-		Scene scene = new Scene(root, 400, 400);
+		root.setAlignment(Pos.CENTER);
+		Scene scene = new Scene(root, 300, 250);
 		
 		stage.setScene(scene);
+		
+		beforeFile = new Label("Enter path to file:       ");
+		file = new TextField();
+		file.setPrefColumnCount(15);
+		
+		beforeShift = new Label("Enter shift for cipher: ");
+		shift = new TextField();
+		shift.setPrefColumnCount(15);
+		
+		
+		root.getChildren().addAll(beforeFile, file, beforeShift, shift);
 		
 		stage.show();
 		
