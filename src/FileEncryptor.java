@@ -55,6 +55,7 @@ public class FileEncryptor extends Application {
 				fileToEncode = new File(file.getText());
 				if(!fileToEncode.exists()){
 					file.setText("Error: cannot connect.");
+					fileToEncode = null;
 				}
 			}
 		});
@@ -62,6 +63,33 @@ public class FileEncryptor extends Application {
 		beforeShift = new Label("Enter shift for cipher: ");
 		shift = new TextField();
 		shift.setPrefColumnCount(15);
+		shift.setOnAction(new EventHandler<ActionEvent>(){
+			
+			public void handle(ActionEvent ae){
+				
+				
+				try{
+					
+					int shift;
+					shift = Integer.parseInt(file.getText().toString());
+					
+					
+				}catch(NumberFormatException e){
+					
+					shift.setText("Enter a number");
+					
+				}
+				
+				if(file != null){
+					
+					
+				}else{
+					shift.setText("No file to encrypt");
+				}
+				
+			}
+			
+		});
 		
 		root.getChildren().addAll(beforeFile, file, beforeShift, shift);
 		
