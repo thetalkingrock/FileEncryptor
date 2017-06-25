@@ -29,6 +29,8 @@ public class FileEncryptor extends Application {
 	TextField file;
 	TextField shift;
 	
+	File fileToEncode = null;
+	
 	public static void main(String[] args) {
 		
 		launch(args);
@@ -48,11 +50,18 @@ public class FileEncryptor extends Application {
 		beforeFile = new Label("Enter path to file:       ");
 		file = new TextField();
 		file.setPrefColumnCount(15);
+		file.setOnAction(new EventHandler<ActionEvent>(){
+			public void handle(ActionEvent ae){
+				fileToEncode = new File(file.getText());
+				if(!fileToEncode.exists()){
+					file.setText("Error: cannot connect.");
+				}
+			}
+		});
 		
 		beforeShift = new Label("Enter shift for cipher: ");
 		shift = new TextField();
 		shift.setPrefColumnCount(15);
-		
 		
 		root.getChildren().addAll(beforeFile, file, beforeShift, shift);
 		
