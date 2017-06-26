@@ -54,15 +54,6 @@ public class FileEncryptor extends Application {
 		beforeFile = new Label("Enter path to file:       ");
 		fileName = new TextField();
 		fileName.setPrefColumnCount(15);
-		fileName.setOnAction(new EventHandler<ActionEvent>(){
-			public void handle(ActionEvent ae){
-				/*fileToEncode = new File(fileName.getText());
-				if(!fileToEncode.exists()){
-					fileName.setText("Error: cannot connect.");
-					fileToEncode = null;
-				}*/
-			}
-		});
 		
 		beforeShift = new Label("Enter shift for cipher: ");
 		shift = new TextField();
@@ -75,14 +66,8 @@ public class FileEncryptor extends Application {
 				if(!fileToEncode.exists()){
 					fileName.setText("Error: cannot connect.");
 					fileToEncode = null;
-				}
-				
-				if(fileToEncode == null){
-					
-					shift.setText("Enter name of file");
 					return;
-					
-				}
+				} //if file doesn't exist, do nothing
 				
 				try{
 					
@@ -90,23 +75,20 @@ public class FileEncryptor extends Application {
 				
 					shiftValue = Integer.parseInt(shift.getText().trim().toString());
 					if(shiftValue < 0 || shiftValue > 25){
-						
 						shift.setText("Invalid number");
 						return;
 					}
 					encode(shiftValue);
 					
-				}catch(NumberFormatException e){
+				}catch(NumberFormatException e){ //in case there's an issue with the user's input 
 					
 					shift.setText("Enter a number");
-					
+	
 				}
-				
 			}
-			
 		});
 		
-		root.getChildren().addAll(beforeFile, fileName, beforeShift, shift);
+		root.getChildren().addAll(beforeFile, fileName, beforeShift, shift); //put everything together in the frame
 		
 		stage.show();
 		
@@ -119,15 +101,15 @@ public class FileEncryptor extends Application {
 			connector = new Scanner(fileToEncode);
 			StringBuilder fileContents = new StringBuilder();
 			
-			while(connector.hasNextLine()){
+			while(connector.hasNextLine()){ //read in contents of file
 				
-				String line = connector.nextLine();
+				String line = connector.nextLine(); //current line to encode
 				
 				for(char c : line.toCharArray())
 				{
-					if(c >= 97 && c <= 122)
+					if(c >= 97 && c <= 122) //handling lowercase letters
 					{
-						if(c + shift > 122)
+						if(c + shift > 122) //done if we need to "wrap" values around
 						{
 							int diff = (c + shift) - 122;
 							fileContents.append((char)(97 + diff - 1));
@@ -135,9 +117,9 @@ public class FileEncryptor extends Application {
 						else
 							fileContents.append((char)(c + shift));
 					}
-					else if(c >= 65 && c <= 90)
+					else if(c >= 65 && c <= 90) //handling uppercase letters
 					{
-						if(c + shift > 90)
+						if(c + shift > 90) //done if we need to "wrap" values around
 						{
 							int diff = (c + shift) - 90;
 							fileContents.append((char)(65 + diff - 1));
@@ -150,23 +132,25 @@ public class FileEncryptor extends Application {
 						fileContents.append(c);
 					}
 				}
-				fileContents.append("\n");
+				fileContents.append("\n"); //important not to forget to add new lines
 			}
 			
 			writer = new PrintWriter(fileToEncode);
 			
-			writer.println(fileContents.toString());
+			writer.println(fileContents.toString()); //write shifted contents back into file
 			
 			
 			
 			
-		}catch(FileNotFoundException e){
+		}catch(FileNotFoundException e){ //in case there's an issue connecting to file
 			
 			fileName.setText("Can't connect to file");
 			
-		}finally{
+		}finally{ //close everything up
+			
 			connector.close();
 			writer.close();
+			
 		}
 		
 		
