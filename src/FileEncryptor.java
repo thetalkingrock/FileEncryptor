@@ -2,10 +2,12 @@
  * This application takes in the path to a file supplied by the user
  * and the shift to be used in the encryption process. If the file is found
  * and is readable, the contents are read, shifted, and placed back in the file.
- * Otherwise, an error message is displayed.   
+ * Otherwise, an error message is displayed. Characters not in 
+ * the Latin alphabet are unaffected. The number entered for the shift
+ * must be between 0 and 25.
  * 
  * @author John Rock
- * @version 0.0
+ * @version 1.0
  * 
  */
 
@@ -20,15 +22,17 @@ import javafx.geometry.*;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.FileNotFoundException;
+
 import java.util.Scanner;
 
 public class FileEncryptor extends Application {
 
 	Label beforeFile;
 	Label beforeShift;
-	TextField file;
+	TextField fileName;
 	TextField shift;
-	
+	Scanner connector;
+	PrintWriter writer;
 	File fileToEncode = null;
 	
 	public static void main(String[] args) {
@@ -48,15 +52,15 @@ public class FileEncryptor extends Application {
 		stage.setScene(scene);
 		
 		beforeFile = new Label("Enter path to file:       ");
-		file = new TextField();
-		file.setPrefColumnCount(15);
-		file.setOnAction(new EventHandler<ActionEvent>(){
+		fileName = new TextField();
+		fileName.setPrefColumnCount(15);
+		fileName.setOnAction(new EventHandler<ActionEvent>(){
 			public void handle(ActionEvent ae){
-				fileToEncode = new File(file.getText());
+				/*fileToEncode = new File(fileName.getText());
 				if(!fileToEncode.exists()){
-					file.setText("Error: cannot connect.");
+					fileName.setText("Error: cannot connect.");
 					fileToEncode = null;
-				}
+				}*/
 			}
 		});
 		
@@ -67,12 +71,30 @@ public class FileEncryptor extends Application {
 			
 			public void handle(ActionEvent ae){
 				
+				fileToEncode = new File(fileName.getText());
+				if(!fileToEncode.exists()){
+					fileName.setText("Error: cannot connect.");
+					fileToEncode = null;
+				}
+				
+				if(fileToEncode == null){
+					
+					shift.setText("Enter name of file");
+					return;
+					
+				}
 				
 				try{
 					
-					int shift;
-					shift = Integer.parseInt(file.getText().toString());
-					
+					int shiftValue;
+				
+					shiftValue = Integer.parseInt(shift.getText().trim().toString());
+					if(shiftValue < 0 || shiftValue > 25){
+						
+						shift.setText("Invalid number");
+						return;
+					}
+					encode(shiftValue);
 					
 				}catch(NumberFormatException e){
 					
@@ -80,22 +102,74 @@ public class FileEncryptor extends Application {
 					
 				}
 				
-				if(file != null){
-					
-					
-				}else{
-					shift.setText("No file to encrypt");
-				}
-				
 			}
 			
 		});
 		
-		root.getChildren().addAll(beforeFile, file, beforeShift, shift);
+		root.getChildren().addAll(beforeFile, fileName, beforeShift, shift);
 		
 		stage.show();
 		
 	}
 	
+	public void encode(int shift){
+			
+		try{
+			
+			connector = new Scanner(fileToEncode);
+			StringBuilder fileContents = new StringBuilder();
+			
+			while(connector.hasNextLine()){
+				
+				String line = connector.nextLine();
+				
+				for(char c : line.toCharArray())
+				{
+					if(c >= 97 && c <= 122)
+					{
+						if(c + shift > 122)
+						{
+							int diff = (c + shift) - 122;
+							fileContents.append((char)(97 + diff - 1));
+						}
+						else
+							fileContents.append((char)(c + shift));
+					}
+					else if(c >= 65 && c <= 90)
+					{
+						if(c + shift > 90)
+						{
+							int diff = (c + shift) - 90;
+							fileContents.append((char)(65 + diff - 1));
+						}
+						else
+							fileContents.append((char)(c + shift));	
+					}
+					else
+					{
+						fileContents.append(c);
+					}
+				}
+				fileContents.append("\n");
+			}
+			
+			writer = new PrintWriter(fileToEncode);
+			
+			writer.println(fileContents.toString());
+			
+			
+			
+			
+		}catch(FileNotFoundException e){
+			
+			fileName.setText("Can't connect to file");
+			
+		}finally{
+			connector.close();
+			writer.close();
+		}
+		
+		
+	}
 
 }
